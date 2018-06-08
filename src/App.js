@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import UserList from './UserList';
 import AddUser from './AddUser';
 import logo from './logo.svg';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 /*
@@ -13,9 +14,28 @@ The instructions for this project are located in the `instructions.md` file.
 */
 
 class App extends Component {
+
   state = {
-    users: []
+    users: [],
+    usernames: [],
+    showWarning: false
   }
+
+  handleAddUser = user => {
+    if(this.state.usernames.includes(user.username)) {
+      this.setState(() => ({showWarning: true}));
+    } else {
+      this.addUser(user);
+    }
+  };
+
+  addUser(user) {
+    this.setState(oldState => ({
+      users: [...oldState.users, user],
+      usernames: [...oldState.usernames, user.username]
+    }));
+  }
+
   render() {
     return (
       <div className='App'>
@@ -25,8 +45,15 @@ class App extends Component {
         </header>
         <div id='main'>
           <div className='container'>
-            <UserList users={this.state.users} />
-            <AddUser onAddUser={this.addUser} />
+            <div className='row'>
+              {this.state.showWarning && (
+                <div className='col-12 alert alert-warning'>
+                  That username is taken. Please choose a unique username.
+                </div>
+              )}
+              <UserList users={this.state.users} />
+              <AddUser onAddUser={this.handleAddUser} />
+            </div>
           </div>
         </div>
       </div>
